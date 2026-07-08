@@ -1,0 +1,10 @@
+Id,NumCountries,Countries,Label
+Balkans,9,"AL, BA, BG, HR, ME, MK, RO, RS, SI",Balkans
+Baltic,3,"EE, LT, LV",Baltic
+Caucasus,3,"AM, AZ, GE",Caucasus
+Eastern Europe,8,"BY, CZ, HU, MD, PL, RU, SK, UA",Eastern Europe
+Mediterranean,4,"CY, GR, IL, TR",Mediterranean
+Nordic,5,"DK, FI, IS, NO, SE",Nordic
+Other,4,"AU, CS, MA, YU",Other
+Southern Europe,6,"AD, ES, IT, MT, PT, SM",Southern Europe
+Western Europe,10,"AT, BE, CH, DE, FR, GB, IE, LU, MC, NL",Western Europe
