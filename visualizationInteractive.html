@@ -11,6 +11,17 @@
   // exact fixed size.
   (function () {
     var W = 2000, H = 1414;
+    // Kill iOS/Android text auto-inflation IMMEDIATELY (before render). The
+    // poster is a fixed 2000px canvas scaled down; mobile "text autosizing"
+    // otherwise boosts every font ~3-4x, which makes the side-question text
+    // wrap one word per line, balloons the header band, and shoves the fixed
+    // grid off the bottom (rows overlap / get clipped). Set it inline on
+    // <html> so it wins regardless of when the runtime injects its <style>.
+    try {
+      var _de = document.documentElement;
+      _de.style.webkitTextSizeAdjust = '100%';
+      _de.style.textSizeAdjust = '100%';
+    } catch (e) {}
     // Touch devices (phones/tablets) get a "lite" render path. The default
     // transform:scale approach keeps the layer at its full 2000x1414 backing
     // store and the browser rasterizes it at the device's 2-3x DPR (~25M px)
@@ -27,16 +38,9 @@
       if (!document.body) return;
       var scale = Math.min(1, window.innerWidth / W, window.innerHeight / H);
       window.__posterScale = scale;
-      if (lite) {
-        document.body.style.transform = '';
-        document.body.style.left = '';
-        document.body.style.top = '';
-        document.body.style.zoom = scale;
-      } else {
-        document.body.style.transform = 'scale(' + scale + ')';
-        document.body.style.left = Math.round((window.innerWidth - W * scale) / 2) + 'px';
-        document.body.style.top = Math.round((window.innerHeight - H * scale) / 2) + 'px';
-      }
+      document.body.style.transform = 'scale(' + scale + ')';
+      document.body.style.left = Math.round((window.innerWidth - W * scale) / 2) + 'px';
+      document.body.style.top = Math.round((window.innerHeight - H * scale) / 2) + 'px';
     }
     window.addEventListener('resize', fit);
     window.addEventListener('orientationchange', fit);
@@ -61,7 +65,7 @@
 <script src="js/disc-geometry.js"></script>
 <style>
   *{ box-sizing:border-box; }
-  html{ margin:0; overflow:hidden; background:#0a0a0a; width:100%; height:100%; }
+  html{ margin:0; overflow:hidden; background:#0a0a0a; width:100%; height:100%; -webkit-text-size-adjust:100%; -moz-text-size-adjust:100%; text-size-adjust:100%; }
   body{ margin:0; width:2000px; height:1414px; overflow:hidden; transform-origin:0 0; position:absolute; }
   @page{ size:1189mm 841mm; margin:0; }
   @media print {
@@ -89,8 +93,6 @@
      that crashes phones. Gated on html.lite (set only for coarse pointers),
      so desktop rendering and print output are untouched. Inline styles win
      on specificity, hence the !important overrides targeted by style attr. */
-  html.lite{ overflow:auto; }
-  html.lite body{ left:0 !important; top:0 !important; transform:none !important; transform-origin:0 0 !important; }
   html.lite [style*="mix-blend-mode"]{ mix-blend-mode:normal !important; }
   html.lite [style*="backdrop-filter"]{ -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
   html.lite [style*="filter:"]{ filter:none !important; }
@@ -98,7 +100,6 @@
   html.lite .euro-disc-art,
   html.lite [style*="discspin"]{ animation:none !important; }
   html.lite .eq-bar{ animation:none !important; transform:scaleY(.62) !important; }
-  @media print { html.lite body{ zoom:1 !important; } }
 </style>
 </helmet>
 
@@ -179,7 +180,7 @@
               </div>
             </div>
             <!-- questions -->
-            <div style="flex:1; display:flex; flex-direction:column; gap:5px; border-left:1px solid rgba(255,255,255,.13); padding-left:30px;">
+            <div style="flex:none; width:1065px; max-width:1065px; display:flex; flex-direction:column; gap:5px; border-left:1px solid rgba(255,255,255,.13); padding-left:30px;">
               <div style="font-family:'Space Mono',monospace; font-size:10.5px; letter-spacing:2.5px; color:#9a958c; text-transform:uppercase; margin-bottom:1px;">Three questions this record set answers</div>
               <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="3">
                 <div style="display:flex; align-items:baseline; gap:11px;">
@@ -197,7 +198,7 @@
           </div>
 
           <!-- HERO GRID : 7 records + colophon -->
-          <div style="flex:1; display:grid; grid-template-columns:repeat(4,1fr); grid-auto-rows:1fr; gap:12px 20px; padding-top:12px; min-height:0;">
+          <div style="flex:none; height:1184px; display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:12px 20px; padding-top:12px; min-height:0;">
             <sc-for list="{{ records }}" as="r">
               <div style="display:flex; flex-direction:column; background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.012)); border:1px solid rgba(255,255,255,.07); border-top:2.5px solid {{ r.accent }}; border-radius:6px; padding:11px 16px 14px; min-height:0;">
                 <!-- slim track header : record-label badge + technical title + stat chip -->
