@@ -1042,7 +1042,7 @@ class Component extends DCLogic {
         tieReadout: isChart ? (chart.shown+' / '+chart.total+' ties') : (edges.length+' ties \u00b7 '+lvlShort),
         tf:'translate('+TX.toFixed(1)+'px,'+TY.toFixed(1)+'px) scale('+Z.toFixed(3)+')', invZoom:(1/Z).toFixed(4),
         cursor: Z>1?(self._panning?'grabbing':'grab'):'default',
-        onWheel, onDown, onMove, onUp, onBg, dim: selNode?1:0,
+        onWheel, onDown, onMove, onUp, onBg, dim: (selNode && !(typeof window!=='undefined' && window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches))?1:0,
         onTouchStart:self._touchPZ.onTouchStart, onTouchMove:self._touchPZ.onTouchMove, onTouchEnd:self._touchPZ.onTouchEnd,
         kicker:'Side '+meta.side+' \u00b7 The Record',
         footer: nodes.length+' nodes \u00b7 '+edges.length+' highlighted ties \u00b7 press Esc or click away to close',
