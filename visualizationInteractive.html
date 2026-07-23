@@ -3,8 +3,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
+  // The poster's own layout is a fixed 2000x1414 canvas (matches the print/
+  // PDF export size exactly, see @page below) -- on screen, scale the whole
+  // thing down (never up) to fit whatever window it's opened in, instead of
+  // silently clipping the bottom/right on smaller viewports. Printing is
+  // untouched: @media print below removes the transform and restores the
+  // exact fixed size.
   (function () {
     var W = 2000, H = 1414;
+    // Touch devices (phones/tablets) get a "lite" render path. The default
+    // transform:scale approach keeps the layer at its full 2000x1414 backing
+    // store and the browser rasterizes it at the device's 2-3x DPR (~25M px)
+    // -- one giant composited layer, plus every mix-blend-mode / blur /
+    // backdrop-filter / drop-shadow forces extra full-size layers. On a phone
+    // that can exhaust GPU memory and crash the tab. In lite mode we instead
+    // use CSS `zoom`, so the browser lays out AND rasterizes at the reduced
+    // size (scale^2 less memory), and the .lite CSS below strips the costly
+    // effects. Desktop + print are completely unchanged.
     var lite = false;
     try { lite = window.matchMedia('(hover: none) and (pointer: coarse)').matches; } catch (e) {}
     if (lite && document.documentElement) document.documentElement.className += ' lite';
